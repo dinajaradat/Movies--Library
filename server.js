@@ -33,7 +33,7 @@ server.get('/favorite', (req, res) => {
 })
 
 server.put('/update/:id', updateMovieHandler)
-server.delete('/delete/:id', DELETEHandler)
+server.delete('/delete/:id', deleteMovieHandler)
 
 
 function conData(title, poster_path, overview) {
@@ -89,7 +89,7 @@ function updateMovieHandler(req,res){
 
 }
 
-function DELETEHandler(req,res){
+function deleteMovieHandler(req,res){
     const id = req.params.id;
     const sql = `DELETE FROM movies WHERE id = ${id}`;
     client.query(sql)
