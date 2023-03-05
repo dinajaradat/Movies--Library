@@ -8,18 +8,15 @@ server.use(cors());
 const pg = require('pg');
 //const path = require('path');
 const getJson = require('./data.json');
-const client = new pg.Client(process.env.DatabaseURL);
 const PORT = 3000;
-
-
-
 server.use(express.json());
+
+
+
+//Routs
+
 server.post('/addMovie', addMovieHandler);
 server.get('/getMovies', getMoviesHandler);
-
-
-
-
 
 const conData1 = new conData(getJson.title, getJson.poster_path, getJson.overview);
 
@@ -34,7 +31,12 @@ server.get('/favorite', (req, res) => {
 
 server.put('/update/:id', updateMovieHandler)
 server.delete('/delete/:id', deleteMovieHandler)
+server.get('/getMovie/:id', getMovieById)
+const client = new pg.Client(process.env.DatabaseURL);
 
+
+
+//Functions
 
 function conData(title, poster_path, overview) {
     this.title = title;
@@ -47,7 +49,7 @@ function conData(title, poster_path, overview) {
 
 function addMovieHandler(req, res) {
     const movie = req.body;
-    const sql = 'INSERT INTO movies(movieName,comments) VALUES($1,$2) RETURNING * ';
+    const sql = 'INSERT INTO movies movieName,comments  VALUES($1,$2) RETURNING * ';
     const values = [movie.movieName, movie.comments];
     console.log(movie);
     client.query(sql,values)
@@ -76,15 +78,15 @@ function updateMovieHandler(req,res){
     const movie = req.body;
     console.log(id);
     console.log(req.body);
-    const sql = 'UPDATE movies  SET movieName=$1,comments =$2  WHERE id =${id}  RETURNING * ';
-    const values = [movie.movieName, movie.comments];
+    const sql = 'UPDATE movies  SET moviename =$1,comments =$2  WHERE id=$3  RETURNING * ';
+    const values = [movie.moviename, movie.comments, id ];
 
     client.query(sql,values)
     .then((data) => {
         res.send(data.rows);
     })
     .catch(error => {
-        res.send('error00');
+        res.send('error');
     });
 
 }
@@ -101,12 +103,29 @@ function deleteMovieHandler(req,res){
     });
 }
 
+function getMovieById(req,res){
+    const id = req.params.id;
+    const sql = 'SELECT * FROM movies WHERE id=$1 ';
+    const values = [id];
+
+    client.query(sql,values)
+    .then((data) => {
+        res.send(data.rows);
+    })
+    .catch(error => {
+        res.send('error');
+    });
+
+}
+
+
 function handleError(req, res, par3) {
     return (`{ 
         "status": 404,
         "responseText": "page not found error" 
     }`);
 }
+
 
 client.connect()
 .then(()=>{
