@@ -1,23 +1,10 @@
 {
-  "name": "movies--library",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dinajar/Movies--Library.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/dinajar/Movies--Library/issues"
-  },
-  "homepage": "https://github.com/dinajar/Movies--Library#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "axios": "^1.3.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "nodemon": "^2.0.21",
+    "pg": "^8.9.0"
   }
 }
