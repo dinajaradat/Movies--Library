@@ -14,7 +14,6 @@ server.use(express.json());
 
 
 //Routes
-
 server.post('/addMovie', addMovieHandler);
 server.get('/getMovies', getMoviesHandler);
 
@@ -136,6 +135,3 @@ client.connect()
 .catch(error => {
     res.send('error')
 });
-
-
-
