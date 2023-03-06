@@ -8,7 +8,7 @@ server.use(cors());
 const pg = require('pg');
 //const path = require('path');
 const getJson = require('./data.json');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 server.use(express.json());
 
 
