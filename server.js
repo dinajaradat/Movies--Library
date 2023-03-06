@@ -49,7 +49,7 @@ function conData(title, poster_path, overview) {
 
 function addMovieHandler(req, res) {
     const movie = req.body;
-    const sql = 'INSERT INTO movies movieName,comments  VALUES($1,$2) RETURNING * ';
+    const sql = 'INSERT INTO movies (movieName,comments)  VALUES ($1,$2) RETURNING * ';
     const values = [movie.movieName, movie.comments];
     console.log(movie);
     client.query(sql,values)
