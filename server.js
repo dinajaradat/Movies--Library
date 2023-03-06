@@ -13,7 +13,7 @@ server.use(express.json());
 
 
 
-//Routs
+//Routes
 
 server.post('/addMovie', addMovieHandler);
 server.get('/getMovies', getMoviesHandler);
