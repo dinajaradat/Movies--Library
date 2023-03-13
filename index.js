@@ -20,7 +20,7 @@ server.get('/', (req, res) => {
 })
 
 server.get('/favorite', (req, res) => {
-    console.log("Welcome to Favorite Page");
+    res.send("Welcome to Favorite Page");
 })
 
 server.get('/trending', trendingHandler);
@@ -36,7 +36,7 @@ server.delete('/delete/:id', deleteMovieHandler)
 server.get('/getMovie/:id', getMovieById)
 const client = new pg.Client(process.env.DatabaseURL);
 
-server.get('*',(req,res)=>{
+server.get('*', (req, res) => {
     res.status(404).send("sorry, somthing went wrong");
 })
 
@@ -52,10 +52,10 @@ function conData(title, poster_path, overview) {
 }
 
 
-function Movie(id, title, release_date, poster_path, overview) {
+function Movie(id, title,name, release_date,first_air_date, poster_path, overview) {
     this.id = id;
-    this.title = title;
-    this.release_date = release_date;
+    this.name = name || title;
+    this.release_date = release_date || first_air_date;
     this.poster_path = poster_path;
     this.overview = overview;
 }
@@ -64,11 +64,11 @@ function Movie(id, title, release_date, poster_path, overview) {
 function trendingHandler(req, res) {
     try {
         const APIKey = process.env.APIKey;
-        const url = 'https://api.themoviedb.org/3/trending/all/week?api_key=${APIKey}';
+        const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${APIKey}`;
         axios.get(url)
             .then((result) => {
                 let movResult = result.data.results.map((item) => {
-                    let newMovie = new Movie(item.id, item.title, item.release_date, item.poster_path, item.overview);
+                    let newMovie = new Movie(item.id, item.title, item.name, item.release_date, item.first_air_date, item.poster_path, item.overview);
                     return newMovie;
                 })
                 res.send(movResult);
@@ -84,21 +84,26 @@ function trendingHandler(req, res) {
 
 }
 
-function searchHandler(req,res){
-    try{
+
+function searchHandler(req, res) {
+    try {
         const APIKey = process.env.APIKey;
-        const url = 'https://api.themoviedb.org/3/trending/all/week?api_key=${APIKey}&query=from';
-        axios.get(url)
-            .then((result)=>{
-                res.send(result.data.results);
+        const URL = `https://api.themoviedb.org/3/search/movie?api_key=${APIKey}&language=en-US&query=from&page=1`;
+        axios.get(URL)
+            .then((movieResult) => {
+                let mapResult = movieResult.data.results.map((item) => {
+                    return new Movie(item.id, item.title, item.name, item.release_date, item.first_air_date, item.poster_path, item.overview);
+                });
+                res.send(mapResult);
             })
-            .catch((err)=>{
+            .catch((err) => {
                 console.log("sorry", err);
                 res.status(500).send(err);
             })
     }
-    catch(error){
-        errorHandler(error);
+
+    catch (error) {
+        errorHandler(error, req, res);
     }
 }
 
@@ -109,88 +114,88 @@ function addMovieHandler(req, res) {
     const sql = 'INSERT INTO movies (movieName,comments)  VALUES ($1,$2) RETURNING * ';
     const values = [movie.movieName, movie.comments];
     console.log(movie);
-    client.query(sql,values)
-    .then((data) => {
-        res.send('data was added');
-    })
-    .catch(error => {
-        res.send('error00');
-    });
+    client.query(sql, values)
+        .then((data) => {
+            res.send('data was added');
+        })
+        .catch(error => {
+            res.send('error00');
+        });
 }
 
 
-function getMoviesHandler(req,res){
+function getMoviesHandler(req, res) {
     const sql = 'SELECT * FROM movies';
     client.query(sql)
-    .then((data) => {
-        res.send(data.rows);
-    })
-    .catch(error => {
-        res.send('error');
-    });
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch(error => {
+            res.send('error');
+        });
 }
 
-function updateMovieHandler(req,res){
+function updateMovieHandler(req, res) {
     const id = req.params.id;
     const movie = req.body;
     console.log(id);
     console.log(req.body);
     const sql = 'UPDATE movies  SET moviename =$1,comments =$2  WHERE id=$3  RETURNING * ';
-    const values = [movie.moviename, movie.comments, id ];
+    const values = [movie.moviename, movie.comments, id];
 
-    client.query(sql,values)
-    .then((data) => {
-        res.send(data.rows);
-    })
-    .catch(error => {
-        res.send('error');
-    });
+    client.query(sql, values)
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch(error => {
+            res.send('error');
+        });
 
 }
 
-function deleteMovieHandler(req,res){
+function deleteMovieHandler(req, res) {
     const id = req.params.id;
     const sql = `DELETE FROM movies WHERE id = ${id}`;
     client.query(sql)
-    .then((data) => {
-        res.json({});
-    })
-    .catch(error => {
-        res.send('error00');
-    });
+        .then((data) => {
+            res.json({});
+        })
+        .catch(error => {
+            res.send('error00');
+        });
 }
 
-function getMovieById(req,res){
+function getMovieById(req, res) {
     const id = req.params.id;
     const sql = 'SELECT * FROM movies WHERE id=$1 ';
     const values = [id];
 
-    client.query(sql,values)
-    .then((data) => {
-        res.send(data.rows);
-    })
-    .catch(error => {
-        res.send('error');
-    });
+    client.query(sql, values)
+        .then((data) => {
+            res.send(data.rows);
+        })
+        .catch(error => {
+            res.send('error');
+        });
 
 }
 
 
 function errorHandler(error, req, res) {
     const err = {
-        status : 500,
-        message : error
+        status: 500,
+        message: error
     }
     res.send(err);
 }
 
 
 client.connect()
-.then(()=>{
-    server.listen(PORT, () => {
-        console.log(`running on port ${PORT}`);
+    .then(() => {
+        server.listen(PORT, () => {
+            console.log(`running on port ${PORT}`);
+        });
+    })
+    .catch(error => {
+        res.send('error')
     });
-})
-.catch(error => {
-    res.send('error')
-});
