@@ -7,7 +7,7 @@ server.use(cors());
 const pg = require('pg');
 //const path = require('path');
 const getJson = require('./data.json');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.use(express.json());
 const axios = require('axios');
 require('dotenv').config();
@@ -111,8 +111,8 @@ function searchHandler(req, res) {
 
 function addMovieHandler(req, res) {
     const movie = req.body;
-    const sql = 'INSERT INTO movies (movieName,comments)  VALUES ($1,$2) RETURNING * ';
-    const values = [movie.movieName, movie.comments];
+    const sql = 'INSERT INTO movies (name,poster_path,overview,comment)  VALUES ($1,$2,$3,$4) RETURNING * ';
+    const values = [movie.name,movie.poster_path,movie.overview, movie.comment];
     console.log(movie);
     client.query(sql, values)
         .then((data) => {
@@ -140,8 +140,8 @@ function updateMovieHandler(req, res) {
     const movie = req.body;
     console.log(id);
     console.log(req.body);
-    const sql = 'UPDATE movies  SET moviename =$1,comments =$2  WHERE id=$3  RETURNING * ';
-    const values = [movie.moviename, movie.comments, id];
+    const sql = 'UPDATE movies  SET name =$1,poster_path =$2 ,overview = $3,comment= $4 WHERE id=$3  RETURNING * ';
+    const values = [movie.name, movie.poster_path,movie.overview, movie.comment, id];
 
     client.query(sql, values)
         .then((data) => {
