@@ -52,7 +52,7 @@ function conData(title, poster_path, overview) {
 }
 
 
-function Movie(id, title,name, release_date,first_air_date, poster_path, overview) {
+function Movie(id, title, name, release_date, first_air_date, poster_path, overview) {
     this.id = id;
     this.name = name || title;
     this.release_date = release_date || first_air_date;
@@ -112,7 +112,7 @@ function searchHandler(req, res) {
 function addMovieHandler(req, res) {
     const movie = req.body;
     const sql = 'INSERT INTO movies (name,poster_path,overview,comment)  VALUES ($1,$2,$3,$4) RETURNING * ';
-    const values = [movie.name,movie.poster_path,movie.overview, movie.comment];
+    const values = [movie.name, movie.poster_path, movie.overview, movie.comment];
     console.log(movie);
     client.query(sql, values)
         .then((data) => {
@@ -140,12 +140,19 @@ function updateMovieHandler(req, res) {
     const movie = req.body;
     console.log(id);
     console.log(req.body);
-    const sql = 'UPDATE movies  SET name =$1,poster_path =$2 ,overview = $3,comment= $4 WHERE id=$3  RETURNING * ';
-    const values = [movie.name, movie.poster_path,movie.overview, movie.comment, id];
+    const sql = 'UPDATE movies  SET name =$1,poster_path =$2 ,overview = $3,comment= $4 WHERE id=$5  RETURNING * ';
+    const values = [movie.name, movie.poster_path, movie.overview, movie.comment, id];
 
     client.query(sql, values)
         .then((data) => {
-            res.send(data.rows);
+            const sql = 'SELECT * FROM movies';
+            client.query(sql)
+                .then((data) => {
+                    res.send(data.rows);
+                })
+                .catch(error => {
+                    res.send('error');
+                });
         })
         .catch(error => {
             res.send('error');
@@ -158,7 +165,14 @@ function deleteMovieHandler(req, res) {
     const sql = `DELETE FROM movies WHERE id = ${id}`;
     client.query(sql)
         .then((data) => {
-            res.json({});
+            const sql = 'SELECT * FROM movies';
+            client.query(sql)
+                .then((data) => {
+                    res.send(data.rows);
+                })
+                .catch(error => {
+                    res.send('error');
+                });
         })
         .catch(error => {
             res.send('error00');
