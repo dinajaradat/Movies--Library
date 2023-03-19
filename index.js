@@ -26,8 +26,8 @@ server.get('/favorite', (req, res) => {
 server.get('/trending', trendingHandler);
 server.get('/search', searchHandler);
 
-server.post('/addMovie', addMovieHandler);
 server.get('/getMovies', getMoviesHandler);
+server.post('/addMovie', addMovieHandler);
 
 const conData1 = new conData(getJson.title, getJson.poster_path, getJson.overview);
 
