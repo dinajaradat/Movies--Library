@@ -7,7 +7,7 @@ server.use(cors());
 const pg = require('pg');
 //const path = require('path');
 const getJson = require('./data.json');
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.use(express.json());
 const axios = require('axios');
 require('dotenv').config();
